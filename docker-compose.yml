@@ -1,0 +1,24 @@
+services:
+  timestamp-service:
+    build:
+      context: ./timestamp-service
+      dockerfile: Dockerfile
+    container_name: timestamp-service
+    ports:
+      - "${TIMESTAMP_SERVICE_PORT}:4000"
+    env_file:
+      - .env
+    restart: always
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:3000"
+    depends_on:
+      - timestamp-service
+    env_file:
+      - .env
+    restart: always

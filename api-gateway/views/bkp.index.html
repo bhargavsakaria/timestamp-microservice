@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+   <head>
+      <title>Timestamp Microservice | freeCodeCamp.org</title>
+      <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon-32x32.png" type="image/x-icon"/>
+      <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+      <link href="style.css" rel="stylesheet" type="text/css">
+   </head>
+
+   <body>
+    <div class="main-container">
+      <h1>Timestamp Microservice</h1>
+      <hr />
+      <div class="card">
+        <form id="timestamp-form">
+          <label for="date-input">Enter a date string or unix timestamp:</label>
+          <input type="text" id="date-input" name="date" placeholder="e.g. 2015-12-25 or 1451001600000" autocomplete="off" />
+          <button type="submit">Get Timestamp</button>
+        </form>
+        <div id="api-response" class="response-box" style="display:none;"></div>
+        <h2>Example Usage:</h2>
+        <ul>
+          <li><a href="api/2015-12-25">/api/2015-12-25</a></li>
+          <li><a href="api/1451001600000">/api/1451001600000</a></li>
+        </ul>
+        <h2>Example Output:</h2>
+        <p>
+          <code>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code>
+        </p>
+      </div>
+      <div class="footer">
+        <p>
+          By <a href="https://www.freecodecamp.org/">freeCodeCamp.org</a>
+        </p>
+      </div>
+    </div>
+    <script>
+      const form = document.getElementById('timestamp-form');
+      const input = document.getElementById('date-input');
+      const responseBox = document.getElementById('api-response');
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const value = input.value.trim();
+        if (!value) return;
+        responseBox.style.display = 'none';
+        responseBox.textContent = 'Loading...';
+        responseBox.style.display = 'block';
+        try {
+          const res = await fetch(`/api/${encodeURIComponent(value)}`);
+          const data = await res.json();
+          responseBox.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+          responseBox.textContent = 'Error fetching data.';
+        }
+      });
+    </script>
+  </body>
+</html>
