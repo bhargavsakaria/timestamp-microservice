@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const axios = require("axios");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 
@@ -17,18 +16,24 @@ app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
-// Proxy to timestamp-service
-app.get("/timestamp/:date", async (req, res) => {
-	try {
-		const { date } = req.params;
-		const tsPort = process.env.TIMESTAMP_SERVICE_PORT || 4000;
-		const response = await axios.get(
-			`http://timestamp-service:${tsPort}/api/${date || ""}`
-		);
-		res.json(response.data);
-	} catch (err) {
-		res.status(500).json({ error: "Timestamp service unreachable" });
+app.get("/api/:date", (req, res) => {
+	const dateParam = req.params.date;
+
+	if (!dateParam) {
+		const now = new Date();
+		return res.json({ unix: now.getTime(), utc: now.toUTCString() });
 	}
+
+	const timestamp = isNaN(dateParam)
+		? Date.parse(dateParam)
+		: parseInt(dateParam);
+	const date = new Date(timestamp);
+
+	if (isNaN(date.getTime())) {
+		return res.json({ error: "Invalid Date" });
+	}
+
+	return res.json({ unix: date.getTime(), utc: date.toUTCString() });
 });
 
 const PORT = process.env.API_GATEWAY_PORT || 3000;
